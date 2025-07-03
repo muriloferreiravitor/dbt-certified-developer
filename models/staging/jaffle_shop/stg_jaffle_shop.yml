@@ -2,23 +2,24 @@ version: 2
 
 models:
   - name: stg_jaffle_shop__customers
-    description: This model cleans up customer data
+    description: Staged customer data from our jaffle shop app.
     columns:
       - name: customer_id
-        description: Primary key
+        description: The primary key for customers.
         data_tests:
           - unique
           - not_null
 
   - name: stg_jaffle_shop__orders
-    description: This model cleans up order data
+    description: Staged order data from our jaffle shop app.
     columns:
       - name: order_id
-        description: Primary key
+        description: Primary key for orders.
         data_tests:
           - unique
           - not_null
       - name: status
+        description: '{{ doc("order_status") }}'
         data_tests:
           - accepted_values:
               # values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
@@ -29,6 +30,7 @@ models:
                 - return_pending
                 - placed
       - name: customer_id
+        description: Foreign key to stg_jaffle_shop__customers.customer_id.
         data_tests:
           - not_null
           - relationships:
