@@ -4,7 +4,7 @@ with
             orderid as order_id
             , max(created) as payment_finalized_date
             , sum(amount) / 100.0 as total_amount_paid
-        from dbt_mfvitor__raw__stripe.payment
+        from {{ source('stripe', 'payment') }}
         where status <> 'fail'
         group by order_id
     )
@@ -19,9 +19,9 @@ with
             , p.payment_finalized_date
             , c.first_name as customer_first_name
             , c.last_name as customer_last_name
-        from dbt_mfvitor__raw__jaffle_shop.orders as orders
+        from {{ source('jaffle_shop', 'orders') }} as orders
         left join p on orders.id = p.order_id
-        left join dbt_mfvitor__raw__jaffle_shop.customers as c on orders.user_id = c.id
+        left join {{ source('jaffle_shop', 'customers') }} as c on orders.user_id = c.id
     )
 
     , customer_orders as (
@@ -30,8 +30,8 @@ with
             , min(orders.order_date) as first_order_date
             , max(orders.order_date) as most_recent_order_date
             , count(orders.id) as number_of_orders
-        from dbt_mfvitor__raw__jaffle_shop.customers as c
-        left join dbt_mfvitor__raw__jaffle_shop.orders as orders
+        from {{ source('jaffle_shop', 'customers') }} as c
+        left join {{ source('jaffle_shop', 'orders') }} as orders
             on c.id = orders.user_id
         group by customer_id
     )
